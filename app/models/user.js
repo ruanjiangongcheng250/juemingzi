@@ -19,9 +19,23 @@ class User extends Model{
         return user;
 
     }
+    static async getUserByOpenid(openid) {
+        const user = await User.findOne({
+            where: {
+                openid
+            }
+        });
+        return user;
+    }
+
+    static async registerByOpenid(openid) {
+        return await User.create({
+            openid
+        })
+    }
 }
 
-Model.init({
+User.init({
     id: {
         type: Sequelize.INTEGER,
         primaryKey: true,

@@ -1,5 +1,41 @@
 2019年10月30号 
+   用户表
    user表的创建   id(自增 主键)   oid(微信或者小程序的openid)   userName（唯一）   password   avator(头像)  email(邮箱 唯一) phone(手机号  唯一) 
+   网站（website）   微信号（wechat）  description(描述)   性别（sex）   年龄(age)
    用户登录的时候可以根据name   phone  email进行登录 所以这三个值新建的时候不同记录的值不能重复  要根据这三个值进行查询  没有查到  才可以进行新增用户操作
+
+   类型表(枚举)
+   id(自增 主键)   type('IT', '日记(只能自己可见)', '随笔')
+
+   文章表
+   id(自增 主键)   类型（来自于类型表）   内容（content）  标题    字数  描述（列表中显示的部分文字）  image(列表中显示的图片)  
+   作者（author）     
+
+   点赞表
+   id(自增 主键) article_id (文章表id)  点赞用户（用户id）      // 可以查出文章的点赞总数
+
+   评论表
+   id（自增 主键）  article_id(文章表)  评论用户（用户id）  content(评论内容)
+
+
+   用户粉丝表（当前登录用户的粉丝）  反之  则是关注
+   id(自增  主键)  用户id(userId (当前登录用户))  粉丝id(fansId  (用户的id))
+
+
+   图片表
+   id(自增  主键)  上传用户id(UserId)   描述（图片描述）    图片链接地址（image_url）
+
+
+
+
+
+   
+
+
+   
+
+
+
+
 
    

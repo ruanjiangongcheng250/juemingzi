@@ -21,7 +21,7 @@ const router = new Router({
     prefix: '/v1/token'
 })
 
-router.post('/', async ctx=>{debugger
+router.post('/', async ctx=>{
     const v = await new TokenValidator().validate(ctx)
     let token
     switch(parseInt(v.get('body.type'))){
