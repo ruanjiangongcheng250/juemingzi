@@ -1,0 +1,5 @@
+2019年10月30号 
+   user表的创建   id(自增 主键)   oid(微信或者小程序的openid)   userName（唯一）   password   avator(头像)  email(邮箱 唯一) phone(手机号  唯一) 
+   用户登录的时候可以根据name   phone  email进行登录 所以这三个值新建的时候不同记录的值不能重复  要根据这三个值进行查询  没有查到  才可以进行新增用户操作
+
+   
