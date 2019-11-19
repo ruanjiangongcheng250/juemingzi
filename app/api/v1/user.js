@@ -24,13 +24,5 @@ router.get('/', async ctx=>{
 })
 
 
-router.get('/type', async ctx=>{
-    ArticleType.bulkCreate([
-        {name:"IT", type: "IT"},
-        {name: "随笔", type: "suibi"},
-        {name: "日记", type: "note"}
-    ])
-})
-
 module.exports = router
 

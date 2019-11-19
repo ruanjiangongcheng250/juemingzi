@@ -64,6 +64,18 @@ User.init({
     email: {
         type: Sequelize.STRING(128),
         unique: true
+    },
+    avator: {
+        type: Sequelize.STRING
+    },
+    desc: {
+        type: Sequelize.STRING
+    },
+    site: {
+        type: Sequelize.STRING
+    },
+    wechat: {
+        type: Sequelize.String
     }
 }, {sequelize, tableName: 'user'})
 

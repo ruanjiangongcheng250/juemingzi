@@ -16,7 +16,15 @@ const LoginType = {
     isThisType
 }
 
+const ArticleType = {
+    IT: 100,
+    NOTE: 101,
+    OTHER: 102,
+    isThisType
+}
+
 
 module.exports = {
-    LoginType
+    LoginType,
+    ArticleType
 }

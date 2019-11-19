@@ -2,7 +2,13 @@ const { sequelize } = require('../core/db')
 const { Sequelize, Model} = require('sequelize')
 
 class Comment extends Model{
-
+    static async add(art_id, user_id, content){
+        await Comment.create({
+            art_id,
+            user_id, 
+            content
+        })
+    }
 }
 
 Comment.init({
@@ -11,11 +17,11 @@ Comment.init({
         primaryKey: true,
         autoIncrement: true
     },
-    article_id: {
-        type: Sequelize.INTEGET
+    art_id: {
+        type: Sequelize.INTEGER
     },
     user_id: {
-        type: Sequelize.INTEGET,
+        type: Sequelize.INTEGER,
     },
     content: {
         type: Sequelize.STRING

@@ -169,6 +169,8 @@ class AddShortCommentValidator extends PostiveIntegerValidator {
     }
 }
 
+
+
 module.exports = {
     PostiveIntegerValidator,
     RegisterValidator,
