@@ -2,7 +2,7 @@ const Router = require('koa-router')
 const {
     TokenValidator,
     NotEmptyValidator
-} = require('../../validators/validator')
+} = require('../../validators/userValidator')
 const {
     LoginType
 } = require('../../lib/enum');

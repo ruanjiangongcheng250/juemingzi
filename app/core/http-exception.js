@@ -70,6 +70,26 @@ class DislikeError extends HttpException {
     }
 }
 
+class AddFansError extends HttpException {
+    constructor(){
+        super();
+        this.msg = '你已经关注过';
+        this.code = 400;
+        this.errorCode = 60003;
+    }
+}
+
+class RemoveFansError extends HttpException {
+    constructor(){
+        super();
+        this.msg = '你已经取消关注过';
+        this.code = 400;
+        this.errorCode = 60004;
+    }
+}
+
+
+
 module.exports = {
     HttpException,
     ParameterException,
@@ -78,5 +98,7 @@ module.exports = {
     AuthFailed,
     Forbbiden,
     LikeError,
-    DislikeError
+    DislikeError,
+    AddFansError,
+    RemoveFansError
 }

@@ -3,7 +3,10 @@ const {
     AddArticleValidator,
     DelArticleValidator,
     UpdateArticleValidator,
-    QueryArticleByIdValidator
+    QueryArticleByIdValidator,
+    QueryAllArticleValidator,
+    QueryPrivate,
+    SearchValidator
 } = require('../../validators/articleValidator');
 const {
     Success
@@ -37,7 +40,16 @@ router.put('/update/:article_id', new Auth().m, async ctx => {
 })
 
 router.get('/queryAllArticle', async ctx => {
-    const articles = await Article.getAll()
+    const v = await new QueryAllArticleValidator().validate(ctx);
+    const articles = await Article.getAll(v.get('query.start'), v.get('query.count'), false)
+    ctx.body = {
+        data: articles
+    }
+})
+
+router.get('/queryPrivate', new Auth().m, async ctx=> {
+    const v = await new QueryPrivate().validate(ctx)
+    const articles = await Article.getAll(v.get('query.start'), v.get('query.count'), false, ctx.auth.uid, true)
     ctx.body = {
         data: articles
     }
@@ -45,7 +57,23 @@ router.get('/queryAllArticle', async ctx => {
 
 router.get('/queryArticleById',new Auth().m, async ctx => {
     const v = await new QueryArticleByIdValidator(ctx).validate(ctx)
-    const result = await Article.queryArticleByid(v, ctx.auth.uid)
+    const result = await Article.getArticleByid(v, ctx.auth.uid)
+    ctx.body = {
+        data: result
+    }
+})
+
+router.get('/favor',new Auth().m, async ctx => {
+    const v = await new QueryAllArticleValidator().validate(ctx)
+    const result = await Article.getFavorArticles(v.get('query.start'), v.get('query.count'), ctx.auth.uid)
+    ctx.body = {
+        data: result
+    }
+})
+
+router.get('/search', async ctx=> {
+    const v = await new SearchValidator().validate(ctx)
+    const result = await Article.search(v.get('query.keywords'), v.get('query.start'), v.get('query.count'))
     ctx.body = {
         data: result
     }

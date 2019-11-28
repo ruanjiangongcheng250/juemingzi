@@ -22,8 +22,8 @@ class AddArticleValidator extends LinValidator {
             })
         ]
         this.content = [
-            new Rule('isLength', '文章内容不得少于200字', {
-                min: 200
+            new Rule('isLength', '文章内容不得少于100字', {
+                min: 100
             })
         ]
     }
@@ -132,6 +132,31 @@ class QueryArticleByIdValidator extends LinValidator {
 }
 
 
+class QueryAllArticleValidator extends LinValidator{
+    constructor(){
+        super()
+        this.count = [
+            new Rule('isInt', 'count必须是整数', {
+                min: 1
+            }),
+            new Rule('isOptional')
+        ]
+        this.start = [
+            new Rule('isInt', 'start必须是整数', {
+                min: 0
+            }),
+            new Rule('isOptional')
+        ]
+    }
+}
+
+class QueryPrivate extends QueryAllArticleValidator {
+    constructor(){
+        super()
+    }
+}
+
+
 class LikeValidator extends LinValidator{
     constructor(){
         super()
@@ -160,12 +185,62 @@ class CommentValidator extends LinValidator{
 }
 
 
+class getCommentValidator extends LinValidator{
+    constructor(){
+        super()
+        this.id =  [
+            new Rule('isInt', '需要是整数', {
+                min: 1
+            })
+        ]
+        this.count =  [
+            new Rule('isInt', '需要是整数', {
+                min: 1
+            })
+        ]
+        this.start =  [
+            new Rule('isInt', '需要是整数', {
+                min: 0
+            })
+        ]
+    }
+}
+
+class SearchValidator extends LinValidator {
+    constructor(){
+        super()
+        this.keywords = [
+            new Rule('isLength','搜索条件不能为空', {
+                min: 1,
+                max: 16
+            })
+        ]
+        this.start = [
+            new Rule('isInt', 'start不合符规范', {
+                min: 0,
+                max: 60000
+            }),
+            new Rule('isOptional', '', 0)
+        ]
+        this.count = [
+            new Rule('isInt', 'count不符合规范', {
+                min: 1, 
+                max: 20
+            }),
+            new Rule('isOptional', '', 20)
+        ]
+    }
+}
 
 module.exports = {
     AddArticleValidator,
     DelArticleValidator,
     UpdateArticleValidator,
     QueryArticleByIdValidator,
+    QueryAllArticleValidator,
     LikeValidator,
-    CommentValidator
+    CommentValidator,
+    getCommentValidator,
+    QueryPrivate,
+    SearchValidator
 }

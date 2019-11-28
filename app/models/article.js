@@ -23,7 +23,8 @@ class Article extends Model {
         await Article.destroy({
             where: {
                 id
-            }
+            },
+            force: true
         })
     }
     static async update(v, ctx){
@@ -41,12 +42,21 @@ class Article extends Model {
             }
         })
     }
-    static async getAll() {
-        const articles = await Article.findAll({
-            where: {
-                isPrivate: false
-            }
+    static async getAll(start, count, isPrivate, author_id) {
+        start = start || 0
+        count = count || 10
+        const where = isPrivate ? {
+            isPrivate,
+            author_id
+        } : {
+            isPrivate
+        }
+        const result = await Article.findAndCountAll({
+            where,
+            limit: count,
+            offset: start
         })
+        const articles = result.rows;
         const ids = []
         articles.forEach(item=>{
             ids.push(item.id)
@@ -63,6 +73,28 @@ class Article extends Model {
         articles.forEach(article=>{
             Article._getEachArticleStatus(article, likes)
         })
+        return result
+    }
+
+    static async getFavorArticles(start, count, user_id) {
+        const result = await Like.findAndCountAll({
+            limit: count,
+            offset: start,
+            user_id
+        })
+        const favors = result.rows;
+        const art_ids = []
+        favors.forEach(item=>{
+            art_ids.push(item.art_id)
+        })
+        const articles = await Article.findAll({
+            where: {
+                isPrivate: false,
+                id:{
+                    [Op.in]:art_ids,
+                }
+            }
+        })
         return articles
     }
 
@@ -76,17 +108,54 @@ class Article extends Model {
         article.setDataValue('fav_nums', count)
     }
 
-    static async queryArticleByid(v, uid){
+    static async getArticleByid(v, uid){
         const art_id = v.get('query.article_id')
         const result = await Article.findOne({
             where: {
-                isPrivate: false,
                 id: art_id
             }
         })
         const like_status = await Like.userLikeIt(art_id, uid)
         result.setDataValue('like_status', like_status)
+        result.increment('view_count',{
+            by: 1
+        })
         return result
+    }
+
+    static async getArticlesByAuthorId(author_id, start, count){
+        start = start || 0
+        count = count || 10
+        const result = await Article.findAndCountAll({
+            where: {
+                author_id,
+                isPrivate: false
+            },
+            limit: count,
+            offset: start,
+            attributes: {exclude: ['content', 'nums']}
+        })
+        return result
+    }
+
+    static async search(keywords, start, count){
+        const result = await Article.findAndCountAll({
+            where: {
+                isPrivate: false,
+                [Op.or]: [{
+                    content: {
+                        [Op.like]: `%${keywords}%`
+                    }
+                }, {
+                    title: {
+                        [Op.like]: `%${keywords}%` 
+                    }
+                }]
+            },
+            offset: start,
+            limit: count
+        })
+        return result;
     }
     
 }
@@ -121,6 +190,10 @@ Article.init({
     isPrivate: {
         type: Sequelize.BOOLEAN,
         defaultValue: false
+    },
+    view_count: {
+        type: Sequelize.INTEGER,
+        defaultValue: 0
     }
 }, {
     sequelize,

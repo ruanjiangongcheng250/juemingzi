@@ -1,13 +1,29 @@
-const { sequelize } = require('../core/db')
-const { Sequelize, Model} = require('sequelize')
+const {
+    sequelize
+} = require('../core/db')
+const {
+    Sequelize,
+    Model
+} = require('sequelize')
 
-class Comment extends Model{
-    static async add(art_id, user_id, content){
+class Comment extends Model {
+    static async add(art_id, content, user_id) {
         await Comment.create({
             art_id,
-            user_id, 
-            content
+            content,
+            user_id
         })
+    }
+
+    static async query(art_id, offset, count) {
+        const result = await Comment.findAndCountAll({
+            where: {
+                art_id
+            },
+            count,
+            offset
+        })
+        return result
     }
 }
 
@@ -26,7 +42,10 @@ Comment.init({
     content: {
         type: Sequelize.STRING
     }
-}, {sequelize, tableName: 'comment'})
+}, {
+    sequelize,
+    tableName: 'comment'
+})
 
 module.exports = {
     Comment

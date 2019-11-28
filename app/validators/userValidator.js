@@ -13,9 +13,7 @@ class PostiveIntegerValidator extends LinValidator {
     constructor() {
         super()
         this.id = [
-            new Rule('isInt', '需要是整数', {
-                min: 1
-            })
+            new Rule('isInt', '需要是整数')
         ]
     }
 }
@@ -131,31 +129,6 @@ class NotEmptyValidator extends LinValidator {
     }
 }
 
-class SearchValidator extends LinValidator {
-    constructor(){
-        super()
-        this.q = [
-            new Rule('isLength','搜索条件不能为空', {
-                min: 1,
-                max: 16
-            })
-        ]
-        this.start = [
-            new Rule('isInt', 'start不合符规范', {
-                min: 0,
-                max: 60000
-            }),
-            new Rule('isOptional', '', 0)
-        ]
-        this.count = [
-            new Rule('isInt', 'count不符合规范', {
-                min: 1, 
-                max: 20
-            }),
-            new Rule('isOptional', '', 20)
-        ]
-    }
-}
 
 class AddShortCommentValidator extends PostiveIntegerValidator {
     constructor(){
@@ -170,12 +143,48 @@ class AddShortCommentValidator extends PostiveIntegerValidator {
 }
 
 
+class GetAuthorValidator extends LinValidator {
+    constructor() {
+        super()
+        this.author_id = [
+            new Rule('isInt', '用户id必须是正整数',{
+                min: 1
+            })
+        ]
+        this.start = [
+            new Rule('isOptional'),
+            new Rule('isInt', 'start必须是正整数', {
+                min: 0
+            })
+        ]
+        this.count = [
+            new Rule('isOptional'),
+            new Rule('isInt', 'start必须是正整数, 并且不能小于1', {
+                min: 1
+            })
+        ]
+    }
+
+    async validateAuthor(vals){
+        const id = vals.query.author_id
+        const author = await User.findOne({
+            where: {
+                id
+            }
+        })
+        if(!author){
+            throw new global.errs.NotFound('作者不存在');
+        }
+    }
+}
+
+
 
 module.exports = {
     PostiveIntegerValidator,
     RegisterValidator,
     TokenValidator,
     NotEmptyValidator,
-    SearchValidator,
-    AddShortCommentValidator
+    AddShortCommentValidator,
+    GetAuthorValidator
 }

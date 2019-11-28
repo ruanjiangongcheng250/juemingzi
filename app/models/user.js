@@ -1,6 +1,8 @@
 const { sequelize } = require('../core/db')
 const { Sequelize, Model, Op } = require('sequelize')
 const bcrypt = require('bcryptjs')
+const { Fans } = require('./fans')
+const { Article } = require('./article')
 
 class User extends Model{
     static async verifyAccountPassword(account, plainPassword){
@@ -33,6 +35,83 @@ class User extends Model{
             openid
         })
     }
+
+    static async getUserById(id){
+        let wordNumber = 0
+        const exclude = ['password', 'openid', 'phone', 'email']
+        const articles = await Article.findAll({
+            where: {
+                author_id: id
+            }
+        })
+        articles.forEach(item=>{
+            wordNumber += item.nums
+        })
+        const userFans = await User.getUserList(id, 'fans')
+        const userFollows = await User.getUserList(id, 'follow')
+        const userArticles = await Article.getArticlesByAuthorId(id)
+        const user = await User.findOne({
+            where: {
+                id
+            },
+            attributes: { exclude }            
+        })
+        user.setDataValue('fans', userFans)
+        user.setDataValue('follows', userFollows)
+        user.setDataValue('articles', userArticles)
+        user.setDataValue('wordNumber', wordNumber)
+        return user
+    }
+
+    static async getUserList(id, type, start=0, count=10){
+        start = start || 0
+        count = count || 10
+        let ids
+        let fansIds = []
+        let followIds = []
+        const fans = await Fans.findAll({ //用户的粉丝 所以在粉丝表中  对用的字段是user_id
+            where: {
+                user_id: id
+            }
+        })
+        const follows = await Fans.findAll({ //用户的关注  此时用户是粉丝 
+            where: {
+                fans_id: id
+            }
+        })
+        fans.forEach(item=>{
+            fansIds.push(item.fans_id)
+        })
+        follows.forEach(item=>{
+            followIds.push(item.user_id)
+        })
+        if(type === 'fans'){
+            ids = fansIds
+        }else if(type === 'follow'){
+            ids = followIds
+        }
+        const result = await User.findAndCountAll({
+            where: {
+                id: {
+                    [Op.in]: ids
+                },
+            },
+            limit: count,
+            offset: start,
+            attributes: { exclude: ['password', 'openid', 'phone', 'email'] }
+        })
+        return result;
+    }
+
+
+    static async getRecommandWriterList() { //根据作者的level 筛选出推荐作者
+        const result = await User.findAll({
+            limit: 10,
+            // order: ["level"] 
+            attributes: {exclude: ["password", "phone", "email", "openid"]}
+        })
+        return result
+    }
 }
 
 User.init({
@@ -42,11 +121,11 @@ User.init({
         autoIncrement: true
     },
     name: {
-        type: Sequelize.STRING,
+        type: Sequelize.STRING(64),
         unique: true
     },
     password: {
-        type: Sequelize.STRING,
+        type: Sequelize.STRING(64),
         set(val){
             const salt = bcrypt.genSaltSync(10) //生成盐  数值越大  成本越高 时间越长
             const pwd = bcrypt.hashSync(val, salt)  // 相同密码生成的值是不一样的  防止彩虹攻击
@@ -54,7 +133,7 @@ User.init({
         }
     },
     openid: {
-        type: Sequelize.STRING(128),
+        type: Sequelize.STRING(64),
         unique: true
     },
     phone: {
@@ -62,20 +141,20 @@ User.init({
         unique: true
     },
     email: {
-        type: Sequelize.STRING(128),
+        type: Sequelize.STRING(64),
         unique: true
     },
     avator: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING(64)
     },
     desc: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING(64)
     },
     site: {
-        type: Sequelize.STRING
+        type: Sequelize.STRING(64)
     },
     wechat: {
-        type: Sequelize.String
+        type: Sequelize.STRING(64)
     }
 }, {sequelize, tableName: 'user'})
 
