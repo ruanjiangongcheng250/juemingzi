@@ -17,6 +17,9 @@ const {
 const {
     Article
 } = require('../../models/article')
+const {
+    User
+} = require('../../models/user')
 
 const router = new Router({
     prefix: '/v1/article'
@@ -73,9 +76,11 @@ router.get('/favor',new Auth().m, async ctx => {
 
 router.get('/search', async ctx=> {
     const v = await new SearchValidator().validate(ctx)
-    const result = await Article.search(v.get('query.keywords'), v.get('query.start'), v.get('query.count'))
+    const articleList = await Article.search(v.get('query.keywords'), v.get('query.start'), v.get('query.count'))
+    const relatedUserList = await User.search(v.get('query.keywords'), 0, 3)
     ctx.body = {
-        data: result
+        article_data: articleList,
+        related_user_data: relatedUserList
     }
 })
 

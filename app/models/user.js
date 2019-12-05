@@ -112,6 +112,20 @@ class User extends Model{
         })
         return result
     }
+
+    static async search(keyword, start, count) {
+        const result = await User.findAndCountAll({
+            where: {
+                name: {
+                    [Op.like]: `%${keyword}%`
+                }
+            },
+            limit: count,
+            offset: start,
+            attributes: {exclude: ["password", "phone", "email", "openid"]}
+        })
+        return result
+    }
 }
 
 User.init({

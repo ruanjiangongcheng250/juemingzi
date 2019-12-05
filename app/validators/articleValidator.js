@@ -227,7 +227,7 @@ class SearchValidator extends LinValidator {
                 min: 1, 
                 max: 20
             }),
-            new Rule('isOptional', '', 20)
+            new Rule('isOptional', '', 10)
         ]
     }
 }
